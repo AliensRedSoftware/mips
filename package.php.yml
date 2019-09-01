@@ -1,0 +1,13 @@
+name: mips
+version: 1.0.0
+description: Установка скина
+deps:
+  jphp-core: '*'
+  jphp-zend-ext: '*'
+  jphp-zip-ext: '*'
+plugins:
+- App
+sources:
+- src
+includes:
+- index.php
