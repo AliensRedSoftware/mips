@@ -10,9 +10,16 @@
       "/jphp-json-ext/jars/jphp-json-ext-0.9.3-SNAPSHOT.jar",
       "/jphp-zip-ext/jars/jphp-zip-ext-0.9.3-SNAPSHOT.jar",
       "/jphp-zip-ext/jars/slf4j-api-1.6.6.jar",
-      "/jphp-zip-ext/jars/zt-zip-1.11.jar"
+      "/jphp-zip-ext/jars/zt-zip-1.11.jar",
+      "/jphp-gui-ext/jars/x-jphp-gui-ext-2.1.3.jar",
+      "/jphp-xml-ext/jars/jphp-xml-ext-0.9.3-SNAPSHOT.jar",
+      "/jphp-graphic-ext/jars/jphp-graphic-ext-0.9.3-SNAPSHOT.jar",
+      "/dn-zip-bundle/src/vendor/develnext.bundle.zip.ZipBundle",
+      "/dn-app-framework/src"
     ]
   },
-  "includes": [],
+  "includes": [
+    "php/gui/framework/functions.php"
+  ],
   "plugins": []
 }
