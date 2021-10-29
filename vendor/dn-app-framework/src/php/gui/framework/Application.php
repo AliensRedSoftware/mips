@@ -14,6 +14,7 @@ use php\lang\System;
 use php\lib\fs;
 use php\lib\str;
 use php\time\Time;
+use php\time\Timer;
 use php\util\Configuration;
 
 /**
@@ -85,10 +86,7 @@ class Application
     {
         $this->startTime = Time::now();
 
-       // System::setProperty("prism.lcdtext", "false");
-        if (Stream::exists('res://.debug/preloader.php')) {
-            include 'res://.debug/preloader.php';
-        }
+        // System::setProperty("prism.lcdtext", "false");
 
         if ($configPath === null) {
             $configPath = 'res://.system/application.conf';
@@ -99,8 +97,8 @@ class Application
         $functions = "res://php/gui/framework/functions";
 
         if (Stream::exists($functions . ".phb")) {
-            $module = new Module("$functions.phb", true);
-            $module->call();
+            /*$module = new Module("$functions.phb", true);
+            $module->call();*/ // nop
         } else {
             include_once "$functions.php";
         }
@@ -108,7 +106,8 @@ class Application
         try {
             $this->loadConfig($configPath);
         } catch (IOException $e) {
-            throw new Exception("Unable to find the '$configPath' config");
+            $this->config = new Configuration();
+            Logger::warn("Unable to find the '$configPath' config");
         }
     }
 
@@ -182,6 +181,28 @@ class Application
     public function getNamespace(): string
     {
         return $this->namespace;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMode()
+    {
+        $mode = 'prod';
+
+        if ($value = System::getProperty('environment')) {
+            $mode = $value;
+        }
+
+        return $mode;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDevMode()
+    {
+        return "dev" === $this->getMode();
     }
 
     /**
@@ -591,16 +612,9 @@ class Application
 
     public function launch(callable $handler = null, callable $after = null)
     {
-        $mainFormClass = $this->mainFormClass;
-        $splashFormClass = $this->splashFormClass;
-        $showMainForm  = $this->config->getBoolean('app.showMainForm') && $mainFormClass;
-
-        /*if (!class_exists($mainFormClass)) {    TODO Remove it
-            throw new Exception("Unable to start the application without the main form class or the class '$mainFormClass' not found");
-        }*/
-
-        $onStart = function () use ($mainFormClass, $splashFormClass, $showMainForm, $handler, $after) {
+        UXApplication::launch(function () use ($handler, $after) {
             static::$instance = $this;
+            $showMainForm = $this->config->getBoolean('app.showMainForm') && $this->mainFormClass;
 
             if ($handler) {
                 $handler();
@@ -616,10 +630,28 @@ class Application
 
             $this->launched = true;
 
-            $startMain = function () use ($mainFormClass, $showMainForm, $after) {
-                $this->mainForm = $mainFormClass ? $this->getForm($mainFormClass) : null;
+            // Если установлен сплеш, показываем его
+            if ($this->splashFormClass) {
+                $this->splash = $this->getForm($this->splashFormClass);
 
+                if ($this->splash) {
+                    Logger::info("Show splash screen ($this->splashFormClass)");
+                    //$this->splash->alwaysOnTop = true; // Напрягает, когда заставка висит впереди окон других программ
+                    $this->splash->show();
+                }
+            }
+
+            // Задержка незначительная, но даёт время прогрузиться сплешу, и он нормально отображается, а не мелькает
+            waitAsync(100, function() use ($showMainForm, $after){
+                // Показываем форму среды
+                $this->mainForm = $this->mainFormClass ? $this->getForm($this->mainFormClass) : null;
                 if ($showMainForm && $this->mainForm) {
+
+                    // Если есть сплеш, форма будет прозрачной (чтоб не мерцала) и свернутой
+                    if($this->splashFormClass && $this->splash){
+                        $this->mainForm->opacity = 0;
+                        $this->mainForm->iconified = true;
+                    }
                     $this->mainForm->show();
                 }
 
@@ -633,41 +665,19 @@ class Application
 
                 Logger::debug("Application start is done.");
 
-                if ($oldSplash = UXApplication::getSplash()) {
-                    if ($this->getConfig()->getBoolean('app.fx.splash.autoHide')) {
-                        $oldSplash->hide();
+                if($this->splashFormClass && $this->splash) {
+                    // Если был показан сплеш, возвращаем непрозрачность, разворачиваем окно, убираем спдеш
+                    $this->mainForm->opacity = 1;
+                    $this->mainForm->iconified = false;
+                    $this->mainForm->toFront();
+                    if($this->getConfig()->getBoolean('app.fx.splash.autoHide')){
+                        $this->splash->hide();
                     }
                 }
-            };
+            });
+        });
 
-            if ($splashFormClass) {
-                $this->splash = $this->getForm($splashFormClass);
-
-                if ($this->splash) {
-                    Logger::info("Show splash screen ($splashFormClass)");
-
-                    /** @var AbstractForm $form */
-                    $form = $this->splash;
-                    $form->alwaysOnTop = true;
-
-                    $form->show();
-                    $form->toFront();
-
-                    if ($oldSplash = UXApplication::getSplash()) {
-                        $oldSplash->hide();
-                    }
-
-                    uiLater(function () use ($form, $startMain) {
-                        waitAsync(1000, $startMain);
-                    });
-                    return;
-                }
-            }
-
-            $startMain();
-        };
-
-        UXApplication::launch($onStart);
+        
     }
 
     /**
@@ -680,6 +690,7 @@ class Application
         Logger::info("Application shutdown");
 
         UXApplication::shutdown();
+        Timer::shutdownAll();
     }
 
     public function isShutdown()

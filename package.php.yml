@@ -1,5 +1,4 @@
 name: mips
-version: 1.0.0
 description: Установка скина
 deps:
   jphp-core: '*'

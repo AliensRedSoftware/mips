@@ -51,6 +51,16 @@ class arr
     }
 
     /**
+     * @param array $array
+     * @param $key
+     * @return bool
+     */
+    public static function hasKey(array $array, $key): bool
+    {
+        return false;
+    }
+
+    /**
      * Converts $collection to array
      * --RU--
      * Конвертирует коллекцию в массив
@@ -254,6 +264,15 @@ class arr
      * @return array
      */
     public static function reverse(array $array)
+    {
+    }
+
+    /**
+     * @param array $array
+     * @param array ...$others
+     * @return array
+     */
+    public static function merge(array $array, array ...$others): array
     {
     }
 }

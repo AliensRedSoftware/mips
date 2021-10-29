@@ -104,10 +104,17 @@ abstract class AbstractForm extends UXForm
      * @param bool $loadBehaviours
      */
     public function __construct(UXForm $origin = null, $loadEvents = true, $loadBehaviours = true)
-    {
+    {   
         parent::__construct($origin);
 
         $this->_app = Application::get();
+
+        $this->addStylesheet('/php/gui/framework/style.css');
+
+        foreach ($this->_app->getStyles() as $one) {
+            $this->addStylesheet($one);
+        }
+
         $this->loadConfig(null, false);
 
         $this->loadDesign();
@@ -122,12 +129,6 @@ abstract class AbstractForm extends UXForm
 
         $this->init();
 
-        $this->addStylesheet('/php/gui/framework/style.css');
-
-        foreach ($this->_app->getStyles() as $one) {
-            $this->addStylesheet($one);
-        }
-
         $this->behaviourManager = $behaviourManager = new FormBehaviourManager($this);
 
         if ($loadBehaviours) {
@@ -136,6 +137,7 @@ abstract class AbstractForm extends UXForm
         }
 
         Logger::debug("Form '{$this->getName()}' is created.");
+        FormCollection::addForm($this);
     }
 
     protected static function getResourcePathByClassName()
@@ -605,52 +607,56 @@ abstract class AbstractForm extends UXForm
 
         $path = $this->getResourcePath() . '.fxml';
 
-        Stream::tryAccess($path, function (Stream $stream) use ($loader) {
-            try {
-                $this->layout = $loader->load($stream);
-            } catch (IOException $e) {
-                throw new IOException("Unable to load {$stream->getPath()}, {$e->getMessage()}");
-            }
-
-            if ($this->layout) {
-                $clones = [];
-                $datas = [];
-
-                DataUtils::scanAll($this->layout, function (UXData $data = null, UXNode $node = null) use (&$clones, &$datas) {
-                    if ($node) {
-                        // skip clones.
-                        if ($node->data('-factory-id')) return;
-
-                        if ($node instanceof UXCustomNode) {
-                            $clones[] = $node;
-                        } else {
-                            $node->data('-factory-name', $this->getName());
-                            $node->data('-factory', $this);
-
-                            if ($data) {
-                                $datas[] = $data;
-                            }
-
-                            $data = $data ?: new UXData();
-                            $wrapper = UXNodeWrapper::get($node);
-                            $wrapper->applyData($data);
-                        }
-                    } else {
-                        //Logger::warn("Unnecessary data component '{$data->id}', node not found.");
-                    }
-                });
-
-                foreach ($clones as $clone) {
-                    $newNode = $this->loadCustomNode($clone);
-
-                    if ($newNode) {
-                        $clone->parent->children->replace($clone, $newNode);
-                    }
+        try {
+            Stream::tryAccess($path, function (Stream $stream) use ($loader) {
+                try {
+                    $this->layout = $loader->load($stream);
+                } catch (IOException $e) {
+                    throw new IOException("Unable to load {$stream->getPath()}, {$e->getMessage()}");
                 }
 
-                foreach ($datas as $data) $data->free();
-            }
-        });
+                if ($this->layout) {
+                    $clones = [];
+                    $datas = [];
+
+                    DataUtils::scanAll($this->layout, function (UXData $data = null, UXNode $node = null) use (&$clones, &$datas) {
+                        if ($node) {
+                            // skip clones.
+                            if ($node->data('-factory-id')) return;
+
+                            if ($node instanceof UXCustomNode) {
+                                $clones[] = $node;
+                            } else {
+                                $node->data('-factory-name', $this->getName());
+                                $node->data('-factory', $this);
+
+                                if ($data) {
+                                    $datas[] = $data;
+                                }
+
+                                $data = $data ?: new UXData();
+                                $wrapper = UXNodeWrapper::get($node);
+                                $wrapper->applyData($data);
+                            }
+                        } else {
+                            //Logger::warn("Unnecessary data component '{$data->id}', node not found.");
+                        }
+                    });
+
+                    foreach ($clones as $clone) {
+                        $newNode = $this->loadCustomNode($clone);
+
+                        if ($newNode) {
+                            $clone->parent->children->replace($clone, $newNode);
+                        }
+                    }
+
+                    foreach ($datas as $data) $data->free();
+                }
+            });
+        } catch (IOException $e) {
+            Logger::warn("Failed to load form layout from $path");
+        }
     }
 
     /**

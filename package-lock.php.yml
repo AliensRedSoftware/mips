@@ -1,21 +1,21 @@
 dependencies:
   jphp-core:
-    version: 1.0.4
+    version: 1.3.1
     info:
-      sha256: 4f1e15f182b6e388977bbe65b65195a1cb0503a69d5abeb16acce49d4d7d9791
-      size: 731440
+      sha256: ed535dd37757df7daee33c28b4a0e4874c61cc9e9ef5ce88ea3abf0da68476ff
+      size: 870591
       repo: http://api.develnext.org
   jphp-runtime:
-    version: 1.0.7
+    version: 1.3.1
     info:
-      sha256: 36ed7baf5e61332446d93c67354e5fa4d159dd71a19443208fbed12ee44cf962
-      size: 1817288
+      sha256: 4c4f10a4781f2e5758637f171c7dcd39dc0df253b7bead9b48cdc688aebeea35
+      size: 1878258
       repo: http://api.develnext.org
   jphp-zend-ext:
-    version: 1.0.0
+    version: 1.1.0
     info:
-      sha256: 448c577abafe147a3c84fccee0f0cfad8ff04a7a6cff5c3a844e7c90fb8eaaf4
-      size: 331519
+      sha256: b418c0933114efb9fb8c70dd9ce709db67b20240f907329107c389e74e40f3e2
+      size: 268988
       repo: http://api.develnext.org
   jphp-json-ext:
     version: 1.0.0
@@ -30,10 +30,10 @@ dependencies:
       size: 154805
       repo: http://api.develnext.org
   jphp-gui-ext:
-    version: 2.1.3
+    version: 3.0.1
     info:
-      sha256: dce0366a2b354fd0946ad60a9d14df14b06af4b49489e5672ece58b59af4b7d7
-      size: 1237215
+      sha256: 81c33cca03a9b8ae38fa09fd77da0148a0cfc1f189b577ae35ada94e8a085462
+      size: 1240847
       repo: http://api.develnext.org
   jphp-xml-ext:
     version: 1.0.0
@@ -54,8 +54,8 @@ dependencies:
       size: 23557
       repo: http://api.develnext.org
   dn-app-framework:
-    version: 1.0.0
+    version: 2.0.2
     info:
-      sha256: 7b96a70d8203d8ebf6fdc281efafbe990335b83cfde5226c1c0782513741afd0
-      size: 782380
+      sha256: 6f27e96dd3d06911fe8e9555fa4142f8fa53ec4121eeef0807e473d27f99cf08
+      size: 803542
       repo: http://api.develnext.org

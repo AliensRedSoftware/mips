@@ -1,6 +1,6 @@
 
 name: jphp-zend-ext
-version: 1.0.0
+version: 1.1.0
 description: Zend PHP legacy functions and classes.
 
 deps:
@@ -14,4 +14,3 @@ doc:
   stub-dirs: ['./src/main/resources/JPHP-INF/sdk']
   langs: {en: English, ru: Русский}
 
-config:

@@ -3,13 +3,13 @@
 ---
 
 ## jphp-runtime
-> version 1.0.7, created by JPPM.
+> version {0}, created by JPPM.
 
 Runtime for JPHP + Standard library.
 
 ### Install
 ```
-jppm add jphp-runtime@1.0.7
+jppm add jphp-runtime@1.3.1
 ```
 
 ### API
@@ -29,6 +29,7 @@ jppm add jphp-runtime@1.0.7
 
 #### `php\io`
 
+- [`DataStream`](https://github.com/jphp-compiler/jphp/blob/master/jphp-runtime/api-docs/classes/php/io/DataStream.md)- _Class DataStream_
 - [`File`](https://github.com/jphp-compiler/jphp/blob/master/jphp-runtime/api-docs/classes/php/io/File.md)- _Class File_
 - [`FileStream`](https://github.com/jphp-compiler/jphp/blob/master/jphp-runtime/api-docs/classes/php/io/FileStream.md)- _Class FileStream_
 - [`IOException`](https://github.com/jphp-compiler/jphp/blob/master/jphp-runtime/api-docs/classes/php/io/IOException.md)- _Class IOException_
